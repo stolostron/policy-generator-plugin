@@ -3,7 +3,6 @@ package internal
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -127,7 +126,7 @@ data:
 			enemy,
 		)
 
-		err := ioutil.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
+		err := os.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
 		if err != nil {
 			t.Fatalf("Failed to write %s", manifestPath)
 		}
@@ -159,7 +158,7 @@ data:
 	// template
 	bogusFilePath := path.Join(tmpDir, "README.md")
 
-	err := ioutil.WriteFile(bogusFilePath, []byte("# My Manifests"), 0o666)
+	err := os.WriteFile(bogusFilePath, []byte("# My Manifests"), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", bogusFilePath)
 	}
@@ -290,7 +289,7 @@ data:
 			i, enemy,
 		)
 
-		err := ioutil.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
+		err := os.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
 		if err != nil {
 			t.Fatalf("Failed to write %s", manifestPath)
 		}
@@ -313,7 +312,7 @@ resources:
 	}
 
 	for kustomizePath, kustomizeYAML := range kustomizeManifests {
-		err := ioutil.WriteFile(kustomizePath, []byte(kustomizeYAML), 0o666)
+		err := os.WriteFile(kustomizePath, []byte(kustomizeYAML), 0o666)
 		if err != nil {
 			t.Fatalf("Failed to write %s", kustomizePath)
 		}
@@ -330,7 +329,7 @@ resources:
 	// Write a bogus file to verify it is not picked up when creating the policy template
 	bogusFilePath := path.Join(kustomizeDir, "this-other-file.yaml")
 
-	err = ioutil.WriteFile(bogusFilePath, []byte("# My Manifests"), 0o666)
+	err = os.WriteFile(bogusFilePath, []byte("# My Manifests"), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", bogusFilePath)
 	}
@@ -375,9 +374,9 @@ resources:
 				assertEqual(t, err.Error(), test.ErrMsg)
 
 				continue
-			} else {
-				t.Fatalf("Failed to get the policy templates: %v", err)
 			}
+
+			t.Fatalf("Failed to get the policy templates: %v", err)
 		}
 
 		assertEqual(t, len(policyTemplates), 1)
@@ -447,7 +446,7 @@ data:
 			enemy,
 		)
 
-		err := ioutil.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
+		err := os.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
 		if err != nil {
 			t.Fatalf("Failed to write %s", manifestPath)
 		}
@@ -468,7 +467,7 @@ data:
 	// template
 	bogusFilePath := path.Join(tmpDir, "README.md")
 
-	err := ioutil.WriteFile(bogusFilePath, []byte("# My Manifests"), 0o666)
+	err := os.WriteFile(bogusFilePath, []byte("# My Manifests"), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", bogusFilePath)
 	}
@@ -698,7 +697,7 @@ data:
   game.properties: enemies=potato
 `
 
-	err := ioutil.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
+	err := os.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestPath)
 	}
@@ -786,7 +785,7 @@ data:
   image: "quay.io/potatos1"
 `
 
-	err := ioutil.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
+	err := os.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestPath)
 	}
@@ -895,7 +894,7 @@ data:
   image: "quay.io/potatos1"
 `
 
-	err := ioutil.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
+	err := os.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestPath)
 	}
@@ -934,7 +933,7 @@ kind: ClusterPolicy
 metadata:
   name: my-awesome-policy`
 
-	err := ioutil.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
+	err := os.WriteFile(manifestPath, []byte(manifestYAML), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestPath)
 	}
@@ -959,7 +958,7 @@ metadata:
 
 	assertEqual(t, len(policyTemplates), 2)
 
-	// This is not an in-depth test since the Kyverno expansion is tested elsewhere. This is to
+	// This is not an in-depth test since the Kyverno expansion is tested elsewhere. This is
 	// to test that glue code is working as expected.
 	expandedPolicyTemplate := policyTemplates[1]
 	objdef := expandedPolicyTemplate["objectDefinition"]
@@ -1051,7 +1050,7 @@ func TestGetPolicyTemplateInvalidManifest(t *testing.T) {
 	tmpDir := t.TempDir()
 	manifestPath := path.Join(tmpDir, "configmap.yaml")
 	// Ensure an error is returned when there is an invalid manifest file
-	err := ioutil.WriteFile(manifestPath, []byte("$i am not YAML!"), 0o666)
+	err := os.WriteFile(manifestPath, []byte("$i am not YAML!"), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestPath)
 	}
@@ -1100,7 +1099,7 @@ data:
     enemies=potato
 `
 
-	err := ioutil.WriteFile(manifestsPath, []byte(yamlContent), 0o666)
+	err := os.WriteFile(manifestsPath, []byte(yamlContent), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestsPath)
 	}
@@ -1145,7 +1144,7 @@ data:
 ---
 `
 
-	err := ioutil.WriteFile(manifestsPath, []byte(yamlContent), 0o666)
+	err := os.WriteFile(manifestsPath, []byte(yamlContent), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestsPath)
 	}
@@ -1184,7 +1183,7 @@ func TestUnmarshalManifestFileInvalidYAML(t *testing.T) {
 	manifestPath := path.Join(tmpDir, "configmaps.yaml")
 	yamlContent := `$I am not YAML`
 
-	err := ioutil.WriteFile(manifestPath, []byte(yamlContent), 0o666)
+	err := os.WriteFile(manifestPath, []byte(yamlContent), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestPath)
 	}
@@ -1201,7 +1200,7 @@ func TestUnmarshalManifestFileNotObject(t *testing.T) {
 	manifestPath := path.Join(tmpDir, "configmaps.yaml")
 	yamlContent := `- i am an array`
 
-	err := ioutil.WriteFile(manifestPath, []byte(yamlContent), 0o666)
+	err := os.WriteFile(manifestPath, []byte(yamlContent), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestPath)
 	}
@@ -1218,7 +1217,7 @@ func TestUnmarshalManifestFileNotObject(t *testing.T) {
 	assertEqual(t, err.Error(), expected)
 }
 
-// nolint: paralleltest
+//nolint:paralleltest
 func TestVerifyManifestPath(t *testing.T) {
 	baseDirectory, err := filepath.EvalSymlinks(t.TempDir())
 	if err != nil {
@@ -1261,14 +1260,14 @@ func TestVerifyManifestPath(t *testing.T) {
 	manifestPath := path.Join(workingDir, "configmap.yaml")
 	yamlContent := "---\nkind: ConfigMap"
 
-	err = ioutil.WriteFile(manifestPath, []byte(yamlContent), 0o666)
+	err = os.WriteFile(manifestPath, []byte(yamlContent), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", manifestPath)
 	}
 
 	otherManifestPath := path.Join(otherDir, "configmap.yaml")
 
-	err = ioutil.WriteFile(otherManifestPath, []byte(yamlContent), 0o666)
+	err = os.WriteFile(otherManifestPath, []byte(yamlContent), 0o666)
 	if err != nil {
 		t.Fatalf("Failed to write %s", otherManifestPath)
 	}
@@ -1344,7 +1343,7 @@ func TestVerifyManifestPath(t *testing.T) {
 
 	for _, test := range tests {
 		test := test
-		// nolint: paralleltest
+		//nolint:paralleltest
 		t.Run(
 			"manifestPath="+test.ManifestPath,
 			func(t *testing.T) {
@@ -1398,7 +1397,7 @@ data:
 	for filename, content := range manifestPaths {
 		manifestPath := path.Join(kustomizeDir, filename)
 
-		err = ioutil.WriteFile(manifestPath, []byte(content), 0o666)
+		err = os.WriteFile(manifestPath, []byte(content), 0o666)
 		if err != nil {
 			t.Fatalf("Failed to write %s", manifestPath)
 		}

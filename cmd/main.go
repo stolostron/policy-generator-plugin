@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/spf13/pflag"
@@ -28,7 +27,7 @@ func main() {
 	}
 
 	// Output results to stdout for Kustomize to handle
-	// nolint:forbidigo
+	//nolint:forbidigo
 	fmt.Print(outputBuffer.String())
 }
 
@@ -61,7 +60,7 @@ func processGeneratorConfig(filePath string) []byte {
 	p := internal.Plugin{}
 
 	// #nosec G304
-	fileData, err := ioutil.ReadFile(filePath)
+	fileData, err := os.ReadFile(filePath)
 	if err != nil {
 		errorAndExit("failed to read file '%s': %s", filePath, err)
 	}
