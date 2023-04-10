@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"open-cluster-management.io/ocm-kustomize-generator-plugins/internal/types"
 )
@@ -2583,12 +2583,12 @@ func TestCreatePolicyWithConfigPolicyAnnotations(t *testing.T) {
 			if err != nil {
 				t.Fatal(err.Error())
 			}
-			// nolint: forcetypeassert
+			//nolint:forcetypeassert
 			spec := policyManifests[0]["spec"].(map[string]interface{})
 			policyTemplates := spec["policy-templates"].([]interface{})
-			// nolint: forcetypeassert
+			//nolint:forcetypeassert
 			configPolicy := policyTemplates[0].(map[string]interface{})["objectDefinition"].(map[string]interface{})
-			// nolint: forcetypeassert
+			//nolint:forcetypeassert
 			metadata := configPolicy["metadata"].(map[string]interface{})
 
 			if test.annotations != nil && len(test.annotations) == 0 {
@@ -2596,7 +2596,7 @@ func TestCreatePolicyWithConfigPolicyAnnotations(t *testing.T) {
 			} else {
 				annotations := map[string]string{}
 				for key, val := range metadata["annotations"].(map[string]interface{}) {
-					// nolint: forcetypeassert
+					//nolint:forcetypeassert
 					annotations[key] = val.(string)
 				}
 
@@ -2691,14 +2691,14 @@ func TestCreatePolicyWithNamespaceSelector(t *testing.T) {
 			if err != nil {
 				t.Fatal(err.Error())
 			}
-			// nolint: forcetypeassert
+			//nolint:forcetypeassert
 			spec := policyManifests[0]["spec"].(map[string]interface{})
 			policyTemplates := spec["policy-templates"].([]interface{})
-			// nolint: forcetypeassert
+			//nolint:forcetypeassert
 			configPolicy := policyTemplates[0].(map[string]interface{})["objectDefinition"].(map[string]interface{})
-			// nolint: forcetypeassert
+			//nolint:forcetypeassert
 			configPolicyOptions := configPolicy["spec"].(map[string]interface{})
-			// nolint: forcetypeassert
+			//nolint:forcetypeassert
 			configPolicySelector := configPolicyOptions["namespaceSelector"].(map[string]interface{})
 
 			if reflect.DeepEqual(test.namespaceSelector, types.NamespaceSelector{}) {
