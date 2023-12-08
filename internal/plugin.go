@@ -1694,6 +1694,11 @@ func (p *Plugin) generateSelector(
 			resolvedSelectorsLS.MatchExpressions = append(resolvedSelectorsLS.MatchExpressions, lsReq)
 		}
 
+		// Sort the MatchExpressions to make the result deterministic
+		sort.Slice(resolvedSelectorsLS.MatchExpressions, func(i, j int) bool {
+			return resolvedSelectorsLS.MatchExpressions[i].Key < resolvedSelectorsLS.MatchExpressions[j].Key
+		})
+
 		resolved, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&resolvedSelectorsLS)
 		if err != nil {
 			panic(err)
