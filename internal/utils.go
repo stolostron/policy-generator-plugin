@@ -574,5 +574,10 @@ func getRootRemediationAction(policyTemplates []map[string]interface{}) string {
 		}
 	}
 
+	// "InformOnly" should only apply to ConfigurationPolicies
+	if strings.EqualFold(action, "informonly") {
+		action = "inform"
+	}
+
 	return action
 }
