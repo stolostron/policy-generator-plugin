@@ -68,6 +68,7 @@ apiVersion: policy.open-cluster-management.io/v1
 kind: IamPolicy
 metadata:
   name: policy-limitclusteradmin-example
+  namespace: test
 spec:
   severity: medium
   namespaceSelector:

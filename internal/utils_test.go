@@ -847,6 +847,8 @@ func TestGetPolicyTemplateFromPolicyTypeManifest(t *testing.T) {
 		// kind will not be overridden by "ConfigurationPolicy".
 		assertEqual(t, IamObjdef["kind"], "IamPolicy")
 		assertEqual(t, IamObjdef["metadata"].(map[string]interface{})["name"], "policy-limitclusteradmin-example")
+		// The namespace is removed
+		assertEqual(t, IamObjdef["metadata"].(map[string]interface{})["namespace"], nil)
 
 		IamSpec, ok := IamObjdef["spec"].(map[string]interface{})
 		if !ok {
