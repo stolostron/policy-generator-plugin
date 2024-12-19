@@ -1,0 +1,33 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: group-du-sno-latest
+placementBindingDefaults:
+  name: group-du-sno-placement-binding
+policyDefaults:
+  namespace: ztp-group
+  placement:
+    labelSelector:
+      group-du-sno: ""
+      du-listOfStuff: "latest"
+  remediationAction: inform
+  severity: low
+  namespaceSelector:
+    exclude:
+      - kube-*
+    include:
+      - '*'
+  evaluationInterval:
+    compliant: 10m
+    noncompliant: 10s
+policies:
+- name: group-du-sno-latest-config-policy
+  manifests:
+    - path: OpenAPI/cr-files/cr1.yaml 
+      patches:
+      - metadata:
+          name: "profile1"
+        spec:
+          listOfStuff:
+          - name: "profile1"
+            myattribute: "ens5f1"

@@ -1,0 +1,45 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+    name: group-du-sno-v4.14
+placementBindingDefaults:
+    name: group-du-sno-v4.14-placement-binding
+policyDefaults:
+    namespace: ztp-group
+    placement:
+        labelSelector:
+            matchExpressions:
+                - key: du-profile
+                  operator: In
+                  values:
+                    - v4.14
+                - key: group-du-sno
+                  operator: Exists
+    remediationAction: inform
+    severity: low
+    namespaceSelector:
+        exclude:
+            - kube-*
+        include:
+            - '*'
+    evaluationInterval:
+        compliant: 10m
+        noncompliant: 10s
+policies:
+    - name: group-du-sno-v4.14-config-policy
+      manifests:
+        - path: cr-files/cr2.yaml
+          patches:
+            - metadata:
+                name: profile1
+                namespace: mynamespace
+              spec:
+                listOfStuff:
+                    - name: profile1
+                      plugins:
+                        e810:
+                            enableDefaultConfig: false
+                            pins: $e810_pins
+                            settings:
+                                LocalHoldoverTimeout: 14401

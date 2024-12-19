@@ -1,0 +1,11 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: CertificatePolicy
+metadata:
+  name: certpolicy-minduration-example
+spec:
+  severity: high
+  namespaceSelector:
+    include: ["*"]
+    exclude: ["kube-*", "openshift-*"]
+  remediationAction: inform
+  minimumDuration: 720h

@@ -1,0 +1,89 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policy-generator-name
+placementBindingDefaults:
+  name: my-placement-binding
+policyDefaults:
+  # categories: []
+  # complianceType: "musthave"
+  controls: 
+    - PR.DS-1 Data-at-rest
+  namespace: my-policies
+  # Use an existing placement so that placement bindings can be consolidated
+  placement:
+    placementPath: input/placement.yaml
+  # Example of using labelSelector to generate a placement
+  # placement:
+  #   labelSelector:
+  #     matchLabels:
+  #       cloud: red hat
+  remediationAction: inform
+  severity: medium
+  # standards: []
+  policySets: 
+    - policyset-config
+policies:
+- name: policy-app-config-aliens
+  disabled: false
+  manifests:
+    - path: input/configmap-aliens.yaml
+      patches:
+        - apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            labels:
+              chandler: bing
+  remediationAction: enforce
+- name: policy-app-config-others
+  disabled: true
+  manifests:
+    - path: input-folder/
+      patches:
+        - apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: game-config-toads
+            namespace: default
+            labels:
+              monica: geller
+- name: policy-require-labels
+  disabled: true
+  manifests:
+    - path: input-kyverno/
+  policySets:
+    - policyset-kyverno
+- name: policy-object-templates-raw
+  disabled: true
+  manifests:
+    - path: input-object-templates-raw/
+  remediationAction: enforce
+- name: policy-require-ns-labels
+  manifests:
+    - path: input-gatekeeper/
+  policySets:
+    - policyset-gatekeeper
+- name: policy-min-cert-duration
+  categories:
+    - AC Access Control
+  controls:
+    - AC-3 Access Enforcement
+  standards:
+    - NIST SP 800-53 
+  manifests:
+    - path: input-policy-type/certpolicy.yaml
+  policySets:
+    - policyset-certpolicy
+policySets:
+- name: policyset-kyverno
+  description: this is a kyverno policy set.
+  policies:
+    - pre-exists-kyverno-policy
+  placement:
+    placementPath: input/placement.yaml
+- name: policyset-gatekeeper
+  description: this is a gatekeeper policy set.
+  placement:
+    placementPath: input/placement.yaml
+- name: policyset-certpolicy
+  description: this is a cert policy set.
