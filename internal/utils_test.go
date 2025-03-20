@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -26,7 +27,7 @@ func assertEqual(t *testing.T, a interface{}, b interface{}) {
 	diff := cmp.Diff(a, b, cmpopts.EquateErrors())
 
 	if diff != "" {
-		t.Fatalf(diff)
+		t.Fatal(diff)
 	}
 }
 
@@ -46,11 +47,12 @@ func assertEqualYaml(t *testing.T, a, b []byte) {
 		aDone := errors.Is(aErr, io.EOF)
 		bDone := errors.Is(bErr, io.EOF)
 
-		if aDone && bDone {
+		switch {
+		case aDone && bDone:
 			return // both inputs had the same number of documents
-		} else if aDone && !bDone {
+		case aDone && !bDone:
 			t.Fatalf("extra yaml doc in second input")
-		} else if !aDone && bDone {
+		case !aDone && bDone:
 			t.Fatalf("missing yaml doc in second input")
 		}
 
@@ -237,10 +239,9 @@ data:
 	// policyTemplates will have only one policyTemplate
 	// and two objTemplate under this policyTemplate
 	for testName, test := range tests {
-		test := test
-
 		t.Run(testName, func(t *testing.T) {
 			t.Parallel()
+
 			policyConf := types.PolicyConfig{
 				PolicyOptions: types.PolicyOptions{
 					ConsolidateManifests: true,
@@ -575,13 +576,13 @@ data:
 
 		assertEqual(t, len(policyTemplates), 4)
 
-		for i := 0; i < len(policyTemplates); i++ {
+		for i := range policyTemplates {
 			policyTemplate := policyTemplates[i]
 			objdef := policyTemplate["objectDefinition"].(map[string]interface{})
 			name := "policy-app-config"
 
 			if i > 0 {
-				name += fmt.Sprintf("%d", i+1)
+				name += strconv.Itoa(i + 1)
 			}
 
 			assertEqual(t, objdef["metadata"].(map[string]interface{})["name"].(string), name)
@@ -784,8 +785,6 @@ func TestIsPolicyTypeManifest(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -795,6 +794,7 @@ func TestIsPolicyTypeManifest(t *testing.T) {
 			} else if test.wantErr != "" {
 				t.Fatalf("expected the error `%s` but got none", test.wantErr)
 			}
+
 			assertEqual(t, gotIsPolicy, test.wantIsPolicy)
 			assertEqual(t, gotIsOcmPolicy, test.wantIsOcmPolicy)
 		})
@@ -1228,7 +1228,7 @@ func TestGetPolicyTemplateInvalidPath(t *testing.T) {
 		t.Fatal("Expected an error but did not get one")
 	}
 
-	expected := fmt.Sprintf("failed to read the manifest path %s", manifestPath)
+	expected := "failed to read the manifest path " + manifestPath
 	assertEqual(t, err.Error(), expected)
 }
 
@@ -1432,7 +1432,7 @@ func TestUnmarshalManifestFileUnreadable(t *testing.T) {
 		t.Fatal("Expected an error but did not get one")
 	}
 
-	expected := fmt.Sprintf("failed to read the manifest file %s", manifestsPath)
+	expected := "failed to read the manifest file " + manifestsPath
 	assertEqual(t, err.Error(), expected)
 }
 
@@ -1601,7 +1601,6 @@ func TestVerifyManifestPath(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		//nolint:paralleltest
 		t.Run(
 			"manifestPath="+test.ManifestPath,
@@ -1658,13 +1657,13 @@ data:
 
 		err = os.WriteFile(manifestPath, []byte(content), 0o666)
 		if err != nil {
-			t.Fatalf("Failed to write %s", manifestPath)
+			t.Fatal("Failed to write " + manifestPath)
 		}
 	}
 
 	manifests, err := processKustomizeDir(kustomizeDir)
 	if err != nil {
-		t.Fatalf(fmt.Sprintf("Unexpected error: %s", err))
+		t.Fatal("Unexpected error: " + err.Error())
 	}
 
 	assertEqual(t, len(manifests), 3)

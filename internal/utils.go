@@ -89,10 +89,12 @@ func getManifests(policyConf *types.PolicyConfig) ([][]map[string]interface{}, e
 						if ok && name != "" {
 							metadata["name"] = name
 						}
+
 						namespace, ok := patchMetadata["namespace"].(string)
 						if ok && namespace != "" {
 							metadata["namespace"] = namespace
 						}
+
 						manifestFile[0]["metadata"] = metadata
 					}
 				}
