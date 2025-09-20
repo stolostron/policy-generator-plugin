@@ -1483,19 +1483,6 @@ func TestVerifyManifestPath(t *testing.T) {
 		t.Fatalf("Failed to evaluate symlinks for the base directory: %v", err)
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get the current working directory: %v", err)
-	}
-
-	defer func() {
-		err := os.Chdir(cwd)
-		if err != nil {
-			// panic since this could affect other tests that haven't yet run
-			panic(fmt.Sprintf("Couldn't go back to the original working directory: %v", err))
-		}
-	}()
-
 	// Set up directory structure, with 'workingdir' as target directory:
 	// baseDirectory (t.TempDir())
 	// ├── workingdir
@@ -1531,10 +1518,7 @@ func TestVerifyManifestPath(t *testing.T) {
 		t.Fatalf("Failed to write %s", otherManifestPath)
 	}
 
-	err = os.Chdir(workingDir)
-	if err != nil {
-		t.Fatalf("Failed to change the working directory to %s: %v", workingDir, err)
-	}
+	t.Chdir(workingDir)
 
 	grandParentDir := path.Join("..", "..")
 	relOtherManifestPath := path.Join("..", "otherdir", "configmap.yaml")
