@@ -21,6 +21,7 @@ func main() {
 	debugFlag := pflag.Bool("debug", false, "Print the stack trace with error messages")
 	helpFlag := pflag.BoolP("help", "h", false, "Print the help message")
 	versionFlag := pflag.Bool("version", false, "Print the version of the generator")
+
 	pflag.Parse()
 
 	if *helpFlag {
@@ -65,8 +66,8 @@ func main() {
 // arguments similar to fmt.Errorf(). If `debug` is set or it is given an empty message
 // string, it throws a panic to print the message along with the trace. Otherwise
 // it prints the formatted message to stderr and exits with error code 1.
-func errorAndExit(msg string, formatArgs ...interface{}) {
-	printArgs := make([]interface{}, len(formatArgs))
+func errorAndExit(msg string, formatArgs ...any) {
+	printArgs := make([]any, len(formatArgs))
 	copy(printArgs, formatArgs)
 	// Show trace if the debug flag is set
 	if msg == "" || debug {
