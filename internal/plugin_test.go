@@ -1,4 +1,3 @@
-// Copyright Contributors to the Open Cluster Management project
 package internal
 
 import (
@@ -48,8 +47,8 @@ func TestGenerate(t *testing.T) {
 		MatchLabels: &map[string]string{},
 	}
 	p.PolicyDefaults.PruneObjectBehavior = "DeleteAll"
-	patch := map[string]interface{}{
-		"metadata": map[string]interface{}{
+	patch := map[string]any{
+		"metadata": map[string]any{
 			"labels": map[string]string{
 				"chandler": "bing",
 			},
@@ -66,7 +65,7 @@ func TestGenerate(t *testing.T) {
 		Manifests: []types.Manifest{
 			{
 				Path:    path.Join(tmpDir, "configmap.yaml"),
-				Patches: []map[string]interface{}{patch},
+				Patches: []map[string]any{patch},
 			},
 		},
 	}
@@ -87,7 +86,7 @@ func TestGenerate(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf, policyConf2)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 	// Default all policy ConsolidateManifests flags are set to true
 	// unless explicitly set
 	assertEqual(t, p.Policies[0].ConsolidateManifests, true)
@@ -304,16 +303,16 @@ policies:
 					t.Fatal("Failed to generate policies from PolicyGenerator manifest", err)
 				}
 
-				var policyObj map[string]interface{}
+				var policyObj map[string]any
 
 				err = yaml.Unmarshal(output, &policyObj)
 				if err != nil {
 					t.Fatal("Failed to unmarshal object", err)
 				}
 
-				policyTemplate := policyObj["spec"].(map[string]interface{})["policy-templates"].([]interface{})[0]
-				objectDef := policyTemplate.(map[string]interface{})["objectDefinition"].(map[string]interface{})
-				configSpec := objectDef["spec"].(map[string]interface{})
+				policyTemplate := policyObj["spec"].(map[string]any)["policy-templates"].([]any)[0]
+				objectDef := policyTemplate.(map[string]any)["objectDefinition"].(map[string]any)
+				configSpec := objectDef["spec"].(map[string]any)
 
 				jsonConfig, err := json.Marshal(configSpec[test.keyName])
 				if err != nil {
@@ -351,8 +350,8 @@ func TestGeneratePolicyDisablePlacement(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{
-		"policyDefaults": map[string]interface{}{
+	p.applyDefaults(map[string]any{
+		"policyDefaults": map[string]any{
 			"generatePolicyPlacement": false,
 		},
 	})
@@ -441,9 +440,9 @@ func TestGeneratePolicyDisablePlacementOverride(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{
-		"policies": []interface{}{
-			map[string]interface{}{
+	p.applyDefaults(map[string]any{
+		"policies": []any{
+			map[string]any{
 				"generatePolicyPlacement": false,
 			},
 		},
@@ -527,7 +526,7 @@ func TestGeneratePolicyExistingPlacementRuleName(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 	// Default all policy ConsolidateManifests flags are set to true
 	// unless explicitly set
 	assertEqual(t, p.Policies[0].ConsolidateManifests, true)
@@ -624,7 +623,7 @@ func TestGeneratePolicyOverrideDefaultPlacement(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, PolicyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	assertEqual(t, p.Policies[0].ConsolidateManifests, true)
 
@@ -720,7 +719,7 @@ func TestGeneratePolicyOverrideDefaultPlacementRule(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, PolicyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	assertEqual(t, p.Policies[0].ConsolidateManifests, true)
 
@@ -812,7 +811,7 @@ func TestGeneratePolicyExistingPlacementName(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 	// Default all policy ConsolidateManifests flags are set to true
 	// unless explicitly set
 	assertEqual(t, p.Policies[0].ConsolidateManifests, true)
@@ -907,7 +906,7 @@ func TestGenerateSeparateBindings(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf, policyConf2)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	if err := p.assertValidConfig(); err != nil {
 		t.Fatal(err.Error())
@@ -1078,7 +1077,7 @@ func TestGenerateMissingBindingName(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf, policyConf2)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	if err := p.assertValidConfig(); err != nil {
 		t.Fatal(err.Error())
@@ -1111,7 +1110,7 @@ func TestCreatePolicy(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err := p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1182,7 +1181,7 @@ func TestCreatePolicyEmptyManifest(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&p.Policies[0])
 	expectedErr := "found empty YAML in the manifest at " + path.Join(tmpDir, "empty.yaml")
@@ -1205,7 +1204,7 @@ func TestCreatePolicyWithAnnotations(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err := p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1254,7 +1253,7 @@ spec:
 	// Check for override default policy with empty map to skip default annotations from the policy
 	p.outputBuffer.Reset()
 	p.Policies[0].PolicyAnnotations = map[string]string{}
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1302,7 +1301,7 @@ spec:
 	// Check for override default policy annotation
 	p.outputBuffer.Reset()
 	p.Policies[0].PolicyAnnotations = map[string]string{"test-wave-annotation": "100"}
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1365,7 +1364,7 @@ func TestCreatePolicyWithLabels(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err := p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1415,7 +1414,7 @@ spec:
 	// Check for override default policy with empty map to skip default labels from the policy
 	p.outputBuffer.Reset()
 	p.Policies[0].PolicyLabels = map[string]string{}
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1463,7 +1462,7 @@ spec:
 	// Check for override default policy labels
 	p.outputBuffer.Reset()
 	p.Policies[0].PolicyLabels = map[string]string{"test-wave-label": "100"}
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1528,7 +1527,7 @@ func TestCreatePolicyHubTemplateOptions(t *testing.T) {
 	}
 	p.Policies = append(p.Policies, policyConf)
 
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err := p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1580,7 +1579,7 @@ spec:
 	p.Policies[0].PolicyOptions = types.PolicyOptions{
 		HubTemplateOptions: types.HubTemplateOptions{ServiceAccountName: "override-sa"},
 	}
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1647,7 +1646,7 @@ func TestCreatePolicyFromCertificatePolicyTypeManifest(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err := p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1713,7 +1712,7 @@ func TestCreatePolicyFromObjectTemplatesRawManifest(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err := p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -1789,8 +1788,8 @@ metadata:
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{
-		"policyDefaults": map[string]interface{}{
+	p.applyDefaults(map[string]any{
+		"policyDefaults": map[string]any{
 			"informGatekeeperPolicies": false,
 		},
 	})
@@ -1855,8 +1854,8 @@ metadata:
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{
-		"policyDefaults": map[string]interface{}{
+	p.applyDefaults(map[string]any{
+		"policyDefaults": map[string]any{
 			"informGatekeeperPolicies": false,
 		},
 	})
@@ -2016,8 +2015,8 @@ spec:
 
 		p.Policies = append(p.Policies, tc.policyConf)
 
-		p.applyDefaults(map[string]interface{}{
-			"policyDefaults": map[string]interface{}{
+		p.applyDefaults(map[string]any{
+			"policyDefaults": map[string]any{
 				"informGatekeeperPolicies": false,
 			},
 		})
@@ -2044,9 +2043,9 @@ func TestCreatePolicyWithDifferentRemediationAction(t *testing.T) {
 	p := Plugin{}
 	p.PolicyDefaults.Namespace = "cert-policies"
 
-	patches := []map[string]interface{}{
+	patches := []map[string]any{
 		{
-			"spec": map[string]interface{}{
+			"spec": map[string]any{
 				"remediationAction": "inform",
 			},
 		},
@@ -2067,7 +2066,7 @@ func TestCreatePolicyWithDifferentRemediationAction(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err := p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -2144,7 +2143,7 @@ func TestCreatePolicyDir(t *testing.T) {
 		},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err := p.createPolicy(&p.Policies[0])
 	if err != nil {
@@ -2218,7 +2217,7 @@ func TestCreatePolicyInvalidYAML(t *testing.T) {
 		Manifests: []types.Manifest{{Path: manifestPath}},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&p.Policies[0])
 	if err == nil {
@@ -2257,7 +2256,7 @@ metadata:
 		Manifests: []types.Manifest{{Path: manifestPath}},
 	}
 	p.Policies = append(p.Policies, policyConf)
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&p.Policies[0])
 	if err == nil {
@@ -2363,7 +2362,7 @@ func TestCreatePlacementClusterSelectors(t *testing.T) {
 	p.csToPlc = map[string]string{}
 	p.PolicyDefaults.Namespace = "my-policies"
 	policyConf := types.PolicyConfig{Name: "policy-app-config"}
-	policyConf.Placement.ClusterSelectors = map[string]interface{}{
+	policyConf.Placement.ClusterSelectors = map[string]any{
 		"cloud":  "red hat",
 		"doesIt": "",
 		"game":   "pacman",
@@ -2410,7 +2409,7 @@ func TestCreatePlacementLabelSelector(t *testing.T) {
 	p.csToPlc = map[string]string{}
 	p.PolicyDefaults.Namespace = "my-policies"
 	policyConf := types.PolicyConfig{Name: "policy-app-config"}
-	policyConf.Placement.LabelSelector = map[string]interface{}{
+	policyConf.Placement.LabelSelector = map[string]any{
 		"cloud":  "red hat",
 		"doesIt": "",
 		"game":   "pacman",
@@ -2475,7 +2474,7 @@ func TestCreatePlacementDuplicateName(t *testing.T) {
 		Name: "policy-app-config2",
 		PolicyOptions: types.PolicyOptions{
 			Placement: types.PlacementConfig{
-				ClusterSelectors: map[string]interface{}{"my": "app"},
+				ClusterSelectors: map[string]any{"my": "app"},
 				Name:             "my-placement",
 			},
 		},
@@ -3150,7 +3149,7 @@ func TestGeneratePolicySets(t *testing.T) {
 			}
 			p.Policies = append(p.Policies, policyConf, policyConf2)
 			tc.setupFunc(&p)
-			p.applyDefaults(map[string]interface{}{})
+			p.applyDefaults(map[string]any{})
 			assertReflectEqual(t, p.Policies[0].PolicySets, tc.expectedPolicySetConfigInPolicy[0])
 			assertReflectEqual(t, p.Policies[1].PolicySets, tc.expectedPolicySetConfigInPolicy[1])
 			assertReflectEqual(t, p.PolicySets, tc.expectedPolicySetConfigs)
@@ -3188,7 +3187,7 @@ func TestGeneratePolicySetsWithPlacement(t *testing.T) {
 	}
 	p.Policies = append(p.Policies, policyConf)
 
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	if err := p.assertValidConfig(); err != nil {
 		t.Fatal(err.Error())
@@ -3313,7 +3312,7 @@ func TestGeneratePolicySetsOverridePlacement(t *testing.T) {
 		Name: "policyset-overrides",
 		PolicySetOptions: types.PolicySetOptions{
 			Placement: types.PlacementConfig{
-				LabelSelector: map[string]interface{}{
+				LabelSelector: map[string]any{
 					"my-label": "my-cluster",
 				},
 			},
@@ -3321,7 +3320,7 @@ func TestGeneratePolicySetsOverridePlacement(t *testing.T) {
 	}
 	p.PolicySets = append(p.PolicySets, policySetConf)
 
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	if err := p.assertValidConfig(); err != nil {
 		t.Fatal(err.Error())
@@ -3445,8 +3444,8 @@ func TestGeneratePolicySetsWithoutPlacement(t *testing.T) {
 	}
 	p.Policies = append(p.Policies, policyConf)
 
-	p.applyDefaults(map[string]interface{}{
-		"policySetDefaults": map[string]interface{}{
+	p.applyDefaults(map[string]any{
+		"policySetDefaults": map[string]any{
 			"generatePolicySetPlacement": false,
 		},
 	})
@@ -3544,13 +3543,13 @@ func TestGeneratePolicySetsWithPolicyPlacement(t *testing.T) {
 			PolicySetOptions: types.PolicySetOptions{
 				Placement: types.PlacementConfig{
 					Name:             "policyset-placement",
-					ClusterSelectors: map[string]interface{}{"my": "app"},
+					ClusterSelectors: map[string]any{"my": "app"},
 				},
 			},
 		},
 	}
 
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	if err := p.assertValidConfig(); err != nil {
 		t.Fatal(err.Error())
@@ -3678,8 +3677,8 @@ func TestCreatePolicySet(t *testing.T) {
 	p.PlacementBindingDefaults.Name = "my-placement-binding"
 	p.PolicyDefaults.Placement.Name = "my-placement-rule"
 	p.PolicyDefaults.Namespace = "my-policies"
-	patch := map[string]interface{}{
-		"metadata": map[string]interface{}{
+	patch := map[string]any{
+		"metadata": map[string]any{
 			"labels": map[string]string{
 				"chandler": "bing",
 			},
@@ -3690,7 +3689,7 @@ func TestCreatePolicySet(t *testing.T) {
 		Manifests: []types.Manifest{
 			{
 				Path:    path.Join(tmpDir, "configmap.yaml"),
-				Patches: []map[string]interface{}{patch},
+				Patches: []map[string]any{patch},
 			},
 		},
 	}
@@ -3714,7 +3713,7 @@ func TestCreatePolicySet(t *testing.T) {
 			},
 		},
 	}
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicySet(&p.PolicySets[0])
 	if err != nil {
@@ -3741,20 +3740,20 @@ spec:
 }
 
 func getYAMLEvaluationInterval(
-	t *testing.T, policyTemplate interface{}, skipFinalValidation bool,
-) map[string]interface{} {
+	t *testing.T, policyTemplate any, skipFinalValidation bool,
+) map[string]any {
 	t.Helper()
 
-	plcTemplate, ok := policyTemplate.(map[string]interface{})
+	plcTemplate, ok := policyTemplate.(map[string]any)
 	assertEqual(t, ok, true)
 
-	configPolicy, ok := plcTemplate["objectDefinition"].(map[string]interface{})
+	configPolicy, ok := plcTemplate["objectDefinition"].(map[string]any)
 	assertEqual(t, ok, true)
 
-	configPolicyOptions, ok := configPolicy["spec"].(map[string]interface{})
+	configPolicyOptions, ok := configPolicy["spec"].(map[string]any)
 	assertEqual(t, ok, true)
 
-	evaluationInterval, ok := configPolicyOptions["evaluationInterval"].(map[string]interface{})
+	evaluationInterval, ok := configPolicyOptions["evaluationInterval"].(map[string]any)
 
 	if !skipFinalValidation {
 		assertEqual(t, ok, true)
@@ -3838,24 +3837,24 @@ func TestGenerateEvaluationInterval(t *testing.T) {
 	}
 	p.Policies = append(p.Policies, policyConf, policyConf2, policyConf3, policyConf4)
 	p.applyDefaults(
-		map[string]interface{}{
-			"policies": []interface{}{
-				map[string]interface{}{
+		map[string]any{
+			"policies": []any{
+				map[string]any{
 					"consolidateManifests": false,
-					"manifests": []interface{}{
-						map[string]interface{}{},
-						map[string]interface{}{},
-						map[string]interface{}{
-							"evaluationInterval": map[string]interface{}{
+					"manifests": []any{
+						map[string]any{},
+						map[string]any{},
+						map[string]any{
+							"evaluationInterval": map[string]any{
 								"compliant":    "",
 								"noncompliant": "",
 							},
 						},
 					},
 				},
-				map[string]interface{}{},
-				map[string]interface{}{
-					"evaluationInterval": map[string]interface{}{
+				map[string]any{},
+				map[string]any{
+					"evaluationInterval": map[string]any{
 						"compliant":    "",
 						"noncompliant": "",
 					},
@@ -3886,12 +3885,12 @@ func TestGenerateEvaluationInterval(t *testing.T) {
 			continue
 		}
 
-		metadata, _ := manifest["metadata"].(map[string]interface{})
+		metadata, _ := manifest["metadata"].(map[string]any)
 
 		name, _ := metadata["name"].(string)
 
-		spec, _ := manifest["spec"].(map[string]interface{})
-		policyTemplates, _ := spec["policy-templates"].([]interface{})
+		spec, _ := manifest["spec"].(map[string]any)
+		policyTemplates, _ := spec["policy-templates"].([]any)
 
 		switch name {
 		case "policy-app-config":
@@ -3961,7 +3960,7 @@ func TestCreatePolicyWithConfigPolicyAnnotations(t *testing.T) {
 			}
 
 			p.Policies = append(p.Policies, policyConf)
-			p.applyDefaults(map[string]interface{}{})
+			p.applyDefaults(map[string]any{})
 
 			err := p.createPolicy(&p.Policies[0])
 			if err != nil {
@@ -3975,18 +3974,18 @@ func TestCreatePolicyWithConfigPolicyAnnotations(t *testing.T) {
 				t.Fatal(err.Error())
 			}
 			//nolint:forcetypeassert
-			spec := policyManifests[0]["spec"].(map[string]interface{})
-			policyTemplates := spec["policy-templates"].([]interface{})
+			spec := policyManifests[0]["spec"].(map[string]any)
+			policyTemplates := spec["policy-templates"].([]any)
 			//nolint:forcetypeassert
-			configPolicy := policyTemplates[0].(map[string]interface{})["objectDefinition"].(map[string]interface{})
+			configPolicy := policyTemplates[0].(map[string]any)["objectDefinition"].(map[string]any)
 			//nolint:forcetypeassert
-			metadata := configPolicy["metadata"].(map[string]interface{})
+			metadata := configPolicy["metadata"].(map[string]any)
 
 			if test.annotations != nil && len(test.annotations) == 0 {
 				assertEqual(t, metadata["annotations"], nil)
 			} else {
 				annotations := map[string]string{}
-				for key, val := range metadata["annotations"].(map[string]interface{}) {
+				for key, val := range metadata["annotations"].(map[string]any) {
 					//nolint:forcetypeassert
 					annotations[key] = val.(string)
 				}
@@ -4076,7 +4075,7 @@ func TestCreatePolicyWithNamespaceSelector(t *testing.T) {
 			policyConf.NamespaceSelector = test.namespaceSelector
 
 			p.Policies = append(p.Policies, policyConf)
-			p.applyDefaults(map[string]interface{}{})
+			p.applyDefaults(map[string]any{})
 
 			err := p.createPolicy(&p.Policies[0])
 			if err != nil {
@@ -4090,14 +4089,14 @@ func TestCreatePolicyWithNamespaceSelector(t *testing.T) {
 				t.Fatal(err.Error())
 			}
 			//nolint:forcetypeassert
-			spec := policyManifests[0]["spec"].(map[string]interface{})
-			policyTemplates := spec["policy-templates"].([]interface{})
+			spec := policyManifests[0]["spec"].(map[string]any)
+			policyTemplates := spec["policy-templates"].([]any)
 			//nolint:forcetypeassert
-			configPolicy := policyTemplates[0].(map[string]interface{})["objectDefinition"].(map[string]interface{})
+			configPolicy := policyTemplates[0].(map[string]any)["objectDefinition"].(map[string]any)
 			//nolint:forcetypeassert
-			configPolicyOptions := configPolicy["spec"].(map[string]interface{})
+			configPolicyOptions := configPolicy["spec"].(map[string]any)
 			//nolint:forcetypeassert
-			configPolicySelector := configPolicyOptions["namespaceSelector"].(map[string]interface{})
+			configPolicySelector := configPolicyOptions["namespaceSelector"].(map[string]any)
 
 			if reflect.DeepEqual(test.namespaceSelector, types.NamespaceSelector{}) {
 				assertSelectorEqual(t, configPolicySelector, p.PolicyDefaults.NamespaceSelector)
@@ -4150,7 +4149,7 @@ func TestGenerateNonDNSPolicyName(t *testing.T) {
 			}
 
 			p.Policies = append(p.Policies, policyConf)
-			p.applyDefaults(map[string]interface{}{})
+			p.applyDefaults(map[string]any{})
 
 			err = p.assertValidConfig()
 			if err == nil {
@@ -4214,7 +4213,7 @@ func TestGenerateNonDNSPlacementName(t *testing.T) {
 				},
 			}
 			p.Policies = append(p.Policies, policyConf)
-			p.applyDefaults(map[string]interface{}{})
+			p.applyDefaults(map[string]any{})
 
 			err = p.assertValidConfig()
 			if err == nil {
@@ -4284,7 +4283,7 @@ func TestGenerateNonDNSBindingName(t *testing.T) {
 				},
 			}
 			p.Policies = append(p.Policies, policyConf, policyConf2)
-			p.applyDefaults(map[string]interface{}{})
+			p.applyDefaults(map[string]any{})
 
 			err = p.assertValidConfig()
 			if err == nil {
@@ -4310,7 +4309,7 @@ func TestCreatePlacementRuleFromMatchExpressions(t *testing.T) {
 	p.csToPlc = map[string]string{}
 	p.PolicyDefaults.Namespace = "my-policies"
 	policyConf := types.PolicyConfig{Name: "policy-app-config"}
-	me := map[string]interface{}{
+	me := map[string]any{
 		"key":      "cloud",
 		"operator": "In",
 		"values": []string{
@@ -4318,8 +4317,8 @@ func TestCreatePlacementRuleFromMatchExpressions(t *testing.T) {
 			"test",
 		},
 	}
-	policyConf.Placement.ClusterSelectors = map[string]interface{}{
-		"matchExpressions": []interface{}{me},
+	policyConf.Placement.ClusterSelectors = map[string]any{
+		"matchExpressions": []any{me},
 	}
 
 	name, err := p.createPolicyPlacement(policyConf.Placement, policyConf.Name)
@@ -4359,7 +4358,7 @@ func TestCreatePlacementRuleWithClusterSelector(t *testing.T) {
 	p.csToPlc = map[string]string{}
 	p.PolicyDefaults.Namespace = "my-policies"
 	policyConf := types.PolicyConfig{Name: "policy-app-config"}
-	me := map[string]interface{}{
+	me := map[string]any{
 		"key":      "cloud",
 		"operator": "In",
 		"values": []string{
@@ -4367,8 +4366,8 @@ func TestCreatePlacementRuleWithClusterSelector(t *testing.T) {
 			"test",
 		},
 	}
-	policyConf.Placement.ClusterSelector = map[string]interface{}{
-		"matchExpressions": []interface{}{me},
+	policyConf.Placement.ClusterSelector = map[string]any{
+		"matchExpressions": []any{me},
 	}
 
 	name, err := p.createPolicyPlacement(policyConf.Placement, policyConf.Name)
@@ -4407,10 +4406,10 @@ func TestCreatePlacementFromMatchLabels(t *testing.T) {
 	p.csToPlc = map[string]string{}
 	p.PolicyDefaults.Namespace = "my-policies"
 	policyConf := types.PolicyConfig{Name: "policy-app-config"}
-	ml := map[string]interface{}{
+	ml := map[string]any{
 		"cloud": "red hat",
 	}
-	policyConf.Placement.ClusterSelectors = map[string]interface{}{
+	policyConf.Placement.ClusterSelectors = map[string]any{
 		"matchLabels": ml,
 	}
 
@@ -4453,7 +4452,7 @@ func TestCreatePlacementFromMatchExpressions(t *testing.T) {
 	p.csToPlc = map[string]string{}
 	p.PolicyDefaults.Namespace = "my-policies"
 	policyConf := types.PolicyConfig{Name: "policy-app-config"}
-	me := map[string]interface{}{
+	me := map[string]any{
 		"key":      "cloud",
 		"operator": "In",
 		"values": []string{
@@ -4461,8 +4460,8 @@ func TestCreatePlacementFromMatchExpressions(t *testing.T) {
 			"test",
 		},
 	}
-	policyConf.Placement.LabelSelector = map[string]interface{}{
-		"matchExpressions": []interface{}{me},
+	policyConf.Placement.LabelSelector = map[string]any{
+		"matchExpressions": []any{me},
 	}
 
 	name, err := p.createPolicyPlacement(policyConf.Placement, policyConf.Name)
@@ -4508,19 +4507,19 @@ func TestCreatePlacementInvalidMatchExpressions(t *testing.T) {
 	p.csToPlc = map[string]string{}
 	p.PolicyDefaults.Namespace = "my-policies"
 	policyConf := types.PolicyConfig{Name: "policy-app-config"}
-	nestedMap := map[string]interface{}{
+	nestedMap := map[string]any{
 		"test": "invalid",
 	}
-	me := map[string]interface{}{
+	me := map[string]any{
 		"key":      "cloud",
 		"operator": "In",
-		"values": []interface{}{
+		"values": []any{
 			"red hat",
 			nestedMap,
 		},
 	}
-	policyConf.Placement.LabelSelector = map[string]interface{}{
-		"matchExpressions": []interface{}{me},
+	policyConf.Placement.LabelSelector = map[string]any{
+		"matchExpressions": []any{me},
 	}
 
 	_, err := p.createPolicyPlacement(policyConf.Placement, policyConf.Name)
@@ -4540,18 +4539,18 @@ func TestCreatePlacementMultipleSelectors(t *testing.T) {
 	p.csToPlc = map[string]string{}
 	p.PolicyDefaults.Namespace = "my-policies"
 	policyConf := types.PolicyConfig{Name: "policy-app-config"}
-	me := map[string]interface{}{
+	me := map[string]any{
 		"key":      "cloud",
 		"operator": "In",
 		"values": []string{
 			"red hat",
 		},
 	}
-	ml := map[string]interface{}{
+	ml := map[string]any{
 		"cloud": "red hat",
 	}
-	policyConf.Placement.LabelSelector = map[string]interface{}{
-		"matchExpressions": []interface{}{me},
+	policyConf.Placement.LabelSelector = map[string]any{
+		"matchExpressions": []any{me},
 		"matchLabels":      ml,
 	}
 
@@ -4620,22 +4619,23 @@ func TestCreatePolicyWithCopyPolicyMetadata(t *testing.T) {
 					},
 				}
 
-				policyDefaultsUnmarshaled := map[string]interface{}{}
-				policyUnmarshaled := map[string]interface{}{}
+				policyDefaultsUnmarshaled := map[string]any{}
+				policyUnmarshaled := map[string]any{}
 
 				if test.copyPolicyMetadata != nil {
-					if mode == "policyDefault" {
+					switch mode {
+					case "policyDefault":
 						policyDefaultsUnmarshaled["copyPolicyMetadata"] = *test.copyPolicyMetadata
-					} else if mode == "policy" {
+					case "policy":
 						policyUnmarshaled["copyPolicyMetadata"] = *test.copyPolicyMetadata
 					}
 				}
 
 				p.Policies = append(p.Policies, policyConf)
 				p.applyDefaults(
-					map[string]interface{}{
+					map[string]any{
 						"policyDefaults": policyDefaultsUnmarshaled,
-						"policies":       []interface{}{policyUnmarshaled},
+						"policies":       []any{policyUnmarshaled},
 					},
 				)
 
@@ -4652,7 +4652,7 @@ func TestCreatePolicyWithCopyPolicyMetadata(t *testing.T) {
 				}
 
 				//nolint:forcetypeassert
-				spec := policyManifests[0]["spec"].(map[string]interface{})
+				spec := policyManifests[0]["spec"].(map[string]any)
 
 				if test.expected == nil {
 					if _, set := spec["copyPolicyMetadata"]; set {
@@ -4703,11 +4703,11 @@ func TestCreatePolicyWithCustomMessage(t *testing.T) {
 	p.Policies = append(p.Policies, policyConf)
 
 	// Ensure values are correctly propagated/overridden
-	p.applyDefaults(map[string]interface{}{})
-	assertEqual(t, policyConf.Manifests[0].ConfigurationPolicyOptions.CustomMessage.Compliant, "{{ default }}")
-	assertEqual(t, policyConf.Manifests[0].ConfigurationPolicyOptions.CustomMessage.NonCompliant, "{{ default }}")
-	assertEqual(t, policyConf.Manifests[1].ConfigurationPolicyOptions.CustomMessage.Compliant, "{{ default }}")
-	assertEqual(t, policyConf.Manifests[1].ConfigurationPolicyOptions.CustomMessage.NonCompliant, "{{ default }}")
+	p.applyDefaults(map[string]any{})
+	assertEqual(t, policyConf.Manifests[0].CustomMessage.Compliant, "{{ default }}")
+	assertEqual(t, policyConf.Manifests[0].CustomMessage.NonCompliant, "{{ default }}")
+	assertEqual(t, policyConf.Manifests[1].CustomMessage.Compliant, "{{ default }}")
+	assertEqual(t, policyConf.Manifests[1].CustomMessage.NonCompliant, "{{ default }}")
 
 	// With consolidateManifest = false
 	policyConf.ConfigurationPolicyOptions = types.ConfigurationPolicyOptions{
@@ -4729,7 +4729,7 @@ func TestCreatePolicyWithCustomMessage(t *testing.T) {
 		},
 	}
 
-	p.applyDefaults(map[string]interface{}{})
+	p.applyDefaults(map[string]any{})
 
 	err = p.createPolicy(&policyConf)
 	if err != nil {
@@ -4801,7 +4801,7 @@ spec:
 	p.outputBuffer.Reset()
 
 	// With consolidateManifest = true
-	policyConf.PolicyOptions.ConsolidateManifests = true
+	policyConf.ConsolidateManifests = true
 	err = p.assertValidConfig()
 	expectedErr := "the policy policy-app-config has the customMessage " +
 		"value set on manifest[0] but consolidateManifests is true"
@@ -4812,10 +4812,10 @@ spec:
 	// to successfully generate a policy. If customMessage field is unset
 	// at the manifest level, applyDefaults() can be used to populate this field
 	// if it's set at the policyDefaults or policy level.
-	policyConf.Manifests[0].ConfigurationPolicyOptions.CustomMessage.Compliant = "{{ root }}"
-	policyConf.Manifests[0].ConfigurationPolicyOptions.CustomMessage.NonCompliant = "{{ root }}"
-	policyConf.Manifests[1].ConfigurationPolicyOptions.CustomMessage.Compliant = "{{ root }}"
-	policyConf.Manifests[1].ConfigurationPolicyOptions.CustomMessage.NonCompliant = "{{ root }}"
+	policyConf.Manifests[0].CustomMessage.Compliant = "{{ root }}"
+	policyConf.Manifests[0].CustomMessage.NonCompliant = "{{ root }}"
+	policyConf.Manifests[1].CustomMessage.Compliant = "{{ root }}"
+	policyConf.Manifests[1].CustomMessage.NonCompliant = "{{ root }}"
 
 	err = p.createPolicy(&policyConf)
 	if err != nil {
