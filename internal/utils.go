@@ -209,12 +209,44 @@ func getPolicyTemplates(policyConf *types.PolicyConfig) ([]map[string]any, error
 			if isPolicyTypeManifest {
 				var policyTemplate map[string]any
 
-				_, found, _ := unstructured.NestedString(manifest, "object-templates-raw")
-				if found {
+				var objectTemplates any
+
+				foundPolicyTemplates := false
+
+				templatesRaw, foundTemplatesRaw, _ := unstructured.NestedString(manifest, "object-templates-raw")
+				if foundTemplatesRaw {
+					objectTemplates = templatesRaw
+					foundPolicyTemplates = true
+				}
+
+				templates, foundTemplates, err := unstructured.NestedSlice(manifest, "object-templates")
+				if err != nil {
+					return nil, fmt.Errorf(
+						"invalid object-templates in manifest path: %s: %w",
+						policyConf.Manifests[i].Path, err,
+					)
+				}
+				if foundTemplates {
+					converted := make([]map[string]any, 0, len(templates))
+					for _, item := range templates {
+						m, ok := item.(map[string]any)
+						if !ok {
+							return nil, fmt.Errorf(
+								"invalid object-templates entry in manifest path: %s: expected an object",
+								policyConf.Manifests[i].Path,
+							)
+						}
+						converted = append(converted, m)
+					}
+					objectTemplates = converted
+					foundPolicyTemplates = true
+				}
+
+				if foundPolicyTemplates {
 					policyNameCounter[policyName]++
 					policyTemplate = buildPolicyTemplate(
 						policyConf,
-						manifest["object-templates-raw"],
+						objectTemplates,
 						&policyConf.Manifests[i].ConfigurationPolicyOptions,
 						getConfigurationPolicyName(policyName, policyNameCounter[policyName]),
 					)
@@ -390,10 +422,11 @@ func setTemplateOptions(tmpl map[string]any, ignorePending bool, extraDeps []typ
 // - the manifest is a root policy manifest
 // - the manifest is invalid because it is missing a name
 func isPolicyTypeManifest(manifest map[string]any, informGatekeeperPolicies bool) (bool, bool, error) {
-	// check for object-templates-raw separate from policies since they have separate requirements
-	_, found, _ := unstructured.NestedString(manifest, "object-templates-raw")
-	if found {
-		// return true for isPolicyType, since object-templates-raw is in a ConfigurationPolicy
+	_, foundTemplatesRaw, _ := unstructured.NestedString(manifest, "object-templates-raw")
+	_, foundTemplates, _ := unstructured.NestedFieldNoCopy(manifest, "object-templates")
+
+	if foundTemplatesRaw || foundTemplates {
+		// return true for isPolicyType, since object-templates-raw and object-templates are in a ConfigurationPolicy
 		return true, true, nil
 	}
 
