@@ -228,12 +228,12 @@ func getPolicyTemplates(policyConf *types.PolicyConfig) ([]map[string]any, error
 				}
 				if foundTemplates {
 					converted := make([]map[string]any, 0, len(templates))
-					for _, item := range templates {
+					for idx, item := range templates {
 						m, ok := item.(map[string]any)
 						if !ok {
 							return nil, fmt.Errorf(
-								"invalid object-templates entry in manifest path: %s: expected an object",
-								policyConf.Manifests[i].Path,
+								"invalid object-templates entry at index %d in manifest path: %s: expected an object",
+								idx, policyConf.Manifests[i].Path,
 							)
 						}
 						converted = append(converted, m)

@@ -1554,7 +1554,7 @@ object-templates:
 		t.Fatal("Expected an error but did not get one")
 	}
 
-	if !strings.Contains(err.Error(), "invalid object-templates entry in manifest path") {
+	if !strings.Contains(err.Error(), "invalid object-templates entry at index 0 in manifest path") {
 		t.Fatalf("Expected an 'invalid object-templates entry' error, got: %v", err)
 	}
 }
